@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Berkas Perkara — Kuis KUP Bab 12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #F6F1E4;
+    --paper-raised: #FBF8EF;
+    --ink: #1B2A45;
+    --ink-soft: #4A5A78;
+    --line: #C9BFA3;
+    --gold: #A9782F;
+    --gold-soft: #D9C48F;
+    --stamp-red: #9B3B34;
+    --stamp-green: #2E6B4F;
+    --wrong-bg: #F4DEDA;
+    --right-bg: #DCEBE0;
+    --shadow: rgba(27,42,69,0.18);
+    --switch-bg: #C9BFA3;
+    color-scheme: light;
+  }
+  html.dark{
+    --paper: #14202F;
+    --paper-raised: #1B2A3D;
+    --ink: #ECE6D6;
+    --ink-soft: #A9B4C4;
+    --line: #3A4A61;
+    --gold: #D9B25E;
+    --gold-soft: #8A713F;
+    --stamp-red: #E3766E;
+    --stamp-green: #6FBF95;
+    --wrong-bg: #3A2323;
+    --right-bg: #1F3A2C;
+    --shadow: rgba(0,0,0,0.45);
+    --switch-bg: #3A4A61;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Source Serif 4', serif;
+    transition:background .4s ease, color .4s ease;
+    min-height:100vh;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(120,110,80,0.045) 28px);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .topbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px;
+    background:var(--paper);
+    border-bottom:2px solid var(--line);
+    transition:background .4s ease, border-color .4s ease;
+  }
+  .topbar .brand{
+    display:flex; flex-direction:column; line-height:1.05;
+  }
+  .brand .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px; letter-spacing:.18em; color:var(--gold);
+    text-transform:uppercase;
+  }
+  .brand .title{
+    font-family:'Lora', serif; font-weight:700; font-size:19px; margin-top:4px;
+  }
+
+  .switch{
+    display:flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.08em;
+    color:var(--ink-soft); text-transform:uppercase;
+    cursor:pointer; user-select:none;
+  }
+  .switch .track{
+    width:46px; height:24px; border-radius:20px;
+    background:var(--switch-bg); position:relative;
+    transition:background .3s ease;
+    border:1px solid var(--line);
+  }
+  .switch .knob{
+    position:absolute; top:2px; left:2px;
+    width:18px; height:18px; border-radius:50%;
+    background:var(--gold);
+    transition:transform .3s ease, background .3s ease;
+    box-shadow:0 1px 3px rgba(0,0,0,.3);
+  }
+  html.dark .switch .knob{ transform:translateX(21px); }
+
+  .wrap{
+    position:relative; z-index:1;
+    max-width:720px; margin:0 auto; padding:36px 24px 90px;
+  }
+
+  .case-header{
+    text-align:center; margin-bottom:30px;
+  }
+  .case-header .kicker{
+    font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:.2em;
+    color:var(--gold); text-transform:uppercase; margin-bottom:10px;
+  }
+  .case-header h1{
+    font-family:'Lora', serif; font-size:clamp(26px,4vw,36px); font-weight:700;
+    margin:0 0 8px;
+  }
+  .case-header p{
+    color:var(--ink-soft); font-size:15px; margin:0; font-style:italic;
+  }
+
+  /* progress */
+  .docket{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:22px; font-family:'JetBrains Mono', monospace;
+    font-size:12px; color:var(--ink-soft); letter-spacing:.05em;
+  }
+  .docket .no{ color:var(--gold); font-weight:700; }
+  .progress-bar{
+    height:4px; background:var(--line); border-radius:2px; overflow:hidden;
+    margin-bottom:26px;
+  }
+  .progress-fill{
+    height:100%; background:var(--gold); width:0%;
+    transition:width .4s ease;
+  }
+
+  /* card */
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:32px;
+    box-shadow:0 10px 26px var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:4px;
+    background:linear-gradient(90deg, var(--gold), var(--gold-soft));
+  }
+  .pasal-tag{
+    display:inline-block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11.5px; letter-spacing:.06em;
+    color:var(--gold);
+    border:1px solid var(--gold-soft);
+    padding:4px 10px; border-radius:3px;
+    margin-bottom:16px;
+  }
+  .question{
+    font-family:'Lora', serif; font-size:19px; font-weight:600;
+    line-height:1.5; margin:0 0 22px;
+  }
+
+  .options{ display:flex; flex-direction:column; gap:12px; }
+  .option{
+    display:flex; align-items:flex-start; gap:12px;
+    padding:14px 16px;
+    border:1.5px solid var(--line);
+    border-radius:5px;
+    cursor:pointer;
+    background:transparent;
+    font-family:'Source Serif 4', serif; font-size:15.5px; color:var(--ink);
+    transition:border-color .2s ease, background .2s ease;
+    text-align:left;
+  }
+  .option:hover:not(.locked){
+    border-color:var(--gold);
+    background:rgba(169,120,47,0.06);
+  }
+  .option .letter{
+    font-family:'JetBrains Mono', monospace; font-weight:700;
+    color:var(--gold); flex-shrink:0;
+  }
+  .option.selected{
+    border-color:var(--gold); background:rgba(169,120,47,0.1);
+  }
+  .option.correct{
+    border-color:var(--stamp-green); background:var(--right-bg);
+  }
+  .option.incorrect{
+    border-color:var(--stamp-red); background:var(--wrong-bg);
+  }
+  .option.locked{ cursor:default; }
+
+  .stamp{
+    position:absolute; top:26px; right:28px;
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:14px; letter-spacing:.12em;
+    padding:6px 14px; border-radius:3px;
+    border:2.5px solid;
+    transform:rotate(6deg);
+    opacity:0; transition:opacity .25s ease, transform .25s ease;
+    pointer-events:none;
+  }
+  .stamp.show{ opacity:.92; transform:rotate(6deg) scale(1); }
+  .stamp.benar{ color:var(--stamp-green); border-color:var(--stamp-green); }
+  .stamp.salah{ color:var(--stamp-red); border-color:var(--stamp-red); }
+
+  .explain{
+    margin-top:22px; padding-top:20px;
+    border-top:1px dashed var(--line);
+    max-height:0; overflow:hidden;
+    opacity:0;
+    transition:max-height .4s ease, opacity .4s ease, margin-top .4s ease, padding-top .4s ease;
+  }
+  .explain.open{ max-height:400px; opacity:1; }
+  .explain .label{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:.15em;
+    color:var(--gold); text-transform:uppercase; margin-bottom:8px;
+  }
+  .explain p{ margin:0; font-size:14.5px; line-height:1.65; color:var(--ink-soft); }
+
+  .actions{
+    display:flex; justify-content:flex-end; margin-top:26px;
+  }
+  button.primary{
+    font-family:'JetBrains Mono', monospace; font-size:13px; letter-spacing:.08em;
+    text-transform:uppercase; font-weight:700;
+    background:var(--ink); color:var(--paper);
+    border:none; padding:12px 26px; border-radius:4px;
+    cursor:pointer; transition:opacity .2s ease, transform .1s ease;
+  }
+  html.dark button.primary{ background:var(--gold); color:#14202F; }
+  button.primary:hover{ opacity:.88; }
+  button.primary:active{ transform:translateY(1px); }
+  button.primary:disabled{ opacity:.35; cursor:not-allowed; }
+
+  /* results */
+  .results{
+    text-align:center;
+  }
+  .results .score{
+    font-family:'Lora', serif; font-weight:700; font-size:56px; margin:8px 0;
+    color:var(--gold);
+  }
+  .results .verdict{
+    font-size:16px; color:var(--ink-soft); margin-bottom:26px; font-style:italic;
+  }
+  .review-list{ text-align:left; display:flex; flex-direction:column; gap:10px; margin-top:20px; }
+  .review-item{
+    display:flex; gap:12px; align-items:flex-start;
+    padding:12px 14px; border:1px solid var(--line); border-radius:5px;
+    font-size:14px;
+  }
+  .review-item .mark{
+    font-family:'JetBrains Mono', monospace; font-weight:700; flex-shrink:0;
+  }
+  .review-item.ok .mark{ color:var(--stamp-green); }
+  .review-item.bad .mark{ color:var(--stamp-red); }
+  .review-item .qtext{ color:var(--ink-soft); }
+
+  .restart{ margin-top:24px; }
+
+  footer{
+    text-align:center; margin-top:40px; font-size:12px; color:var(--ink-soft);
+    font-family:'JetBrains Mono', monospace; letter-spacing:.05em;
+  }
+
+  @media (max-width:600px){
+    .card{ padding:24px 18px; }
+    .stamp{ top:18px; right:18px; font-size:11px; padding:4px 9px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="eyebrow">Berkas Perkara No. 12</span>
+    <span class="title">Kuis KUP — Ketentuan Khusus &amp; Pidana</span>
+  </div>
+  <div class="switch" id="themeToggle" role="button" aria-label="Ganti mode terang/gelap">
+    <span id="switchLabel">Terang</span>
+    <div class="track"><div class="knob"></div></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div id="quizView">
+    <div class="case-header">
+      <div class="kicker">Bab 12 · Undang-Undang KUP</div>
+      <h1>Uji Pemahaman: Ketentuan Khusus &amp; Ketentuan Pidana</h1>
+      <p>25 soal berdasarkan Pasal 32–44B UU KUP. Jawab, lalu periksa pembahasannya.</p>
+    </div>
+
+    <div class="docket">
+      <span>Soal <span class="no" id="qIndex">1</span> / 25</span>
+      <span id="qScoreLive">Skor sementara: 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="card" id="card">
+      <div class="stamp" id="stamp">BENAR</div>
+      <div class="pasal-tag" id="pasalTag">Pasal 32</div>
+      <div class="question" id="questionText">—</div>
+      <div class="options" id="optionsWrap"></div>
+
+      <div class="explain" id="explainWrap">
+        <div class="label">Pembahasan</div>
+        <p id="explainText"></p>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="actionBtn" disabled>Periksa Jawaban</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultView" style="display:none;">
+    <div class="case-header">
+      <div class="kicker">Putusan Akhir</div>
+      <h1>Rekap Hasil Kuis</h1>
+    </div>
+    <div class="card results">
+      <div class="score" id="finalScore">0/25</div>
+      <div class="verdict" id="finalVerdict">—</div>
+      <div class="review-list" id="reviewList"></div>
+      <div class="restart">
+        <button class="primary" id="restartBtn">Ulangi Kuis</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Disusun dari Makalah KUP Kelompok 7 — Bab 12: Ketentuan Khusus &amp; Pidana</footer>
+</div>
+
+<script>
+const questions = [
+  {pasal:"Pasal 32", q:"Menurut Pasal 32 UU KUP, badan sebagai Wajib Pajak diwakili oleh siapa dalam menjalankan hak dan kewajiban perpajakannya?", options:["Pengurusnya","Notaris perusahaan","Konsultan pajak yang ditunjuk DJP","Pemegang saham mayoritas"], answer:0, explain:"Pasal 32 UU KUP menyatakan badan diwakili oleh pengurusnya, warisan belum terbagi oleh salah satu ahli waris/pelaksana wasiat/pengurus harta peninggalan, dan anak belum dewasa/orang dalam pengampuan oleh wali atau pengampunya."},
+  {pasal:"Pasal 32", q:"Warisan yang belum terbagi, menurut Pasal 32 UU KUP, diwakili dalam urusan perpajakan oleh?", options:["Kantor urusan agama","Salah seorang ahli waris, pelaksana wasiat, atau pengurus harta peninggalan","Notaris pembuat akta waris","Kantor Pertanahan"], answer:1, explain:"Pasal 32 UU KUP secara spesifik menunjuk salah seorang ahli waris, pelaksana wasiat, atau pengurus harta peninggalan sebagai wakil untuk warisan yang belum terbagi."},
+  {pasal:"Pasal 32", q:"Sejauh mana tanggung jawab wakil Wajib Pajak atas pembayaran pajak yang terutang menurut Pasal 32?", options:["Tidak bertanggung jawab sama sekali", "Bertanggung jawab secara pribadi dan/atau renteng, kecuali dapat membuktikan tanggung jawab itu tak mungkin dibebankan kepadanya", "Hanya bertanggung jawab jika terbukti melakukan tindak pidana", "Bertanggung jawab hanya sebatas honornya sebagai wakil"], answer:1, explain:"Pasal 32 menegaskan wakil bertanggung jawab secara pribadi dan/atau renteng atas pajak terutang, kecuali ia dapat membuktikan bahwa tanggung jawab tersebut tidak mungkin dibebankan kepadanya."},
+  {pasal:"Pasal 32A", q:"Pasal 32A UU KUP menjadi dasar hukum bagi pemerintah untuk melakukan apa dengan negara lain?", options:["Perjanjian dagang bebas", "Perjanjian penghindaran pajak berganda (P3B) dan pencegahan pengelakan pajak", "Perjanjian ekstradisi", "Perjanjian tenaga kerja migran"], answer:1, explain:"Pasal 32A memberi dasar hukum bagi pemerintah untuk mengadakan P3B (Perjanjian Penghindaran Pajak Berganda) dan pencegahan pengelakan pajak dengan negara lain, sekaligus menjadi dasar keikutsertaan Indonesia dalam AEoI."},
+  {pasal:"Pasal 32A", q:"Standar pertukaran informasi perpajakan internasional yang didasarkan pada Pasal 32A UU KUP dikenal dengan istilah?", options:["Automatic Exchange of Information (AEoI)", "Base Erosion and Profit Shifting (BEPS)", "Foreign Account Tax Compliance Act (FATCA)", "Common Reporting Standard Only (CRS-O)"], answer:0, explain:"Pasal 32A menjadi dasar hukum bagi Indonesia untuk mengikuti standar Automatic Exchange of Information (AEoI) dalam pertukaran informasi perpajakan internasional."},
+  {pasal:"Pasal 33", q:"Pasal 33 UU KUP mengatur tanggung jawab renteng badan usaha yang berlaku dalam kondisi apa?", options:["Badan usaha baru berdiri", "Badan usaha dibubarkan, digabungkan, dipecah/dimekarkan, atau diambil alih", "Badan usaha mengganti nama saja", "Badan usaha pindah alamat kantor"], answer:1, explain:"Pasal 33 mengatur bahwa dalam hal badan usaha dibubarkan, digabungkan, dipecah/dimekarkan, atau diambil alih, pengurus, likuidator, atau pihak yang ditunjuk bertanggung jawab secara renteng atas utang pajak badan usaha tersebut."},
+  {pasal:"Pasal 34A", q:"Menurut Pasal 34A UU KUP, siapa saja yang dilarang memberitahukan hal yang diketahui dari Wajib Pajak karena jabatan/pekerjaannya?", options:["Hanya pegawai DJP", "Setiap pejabat, termasuk tenaga ahli seperti akuntan, pengacara, dan konsultan pajak", "Hanya notaris", "Hanya hakim pengadilan pajak"], answer:1, explain:"Pasal 34A melarang setiap pejabat memberitahukan hal yang diketahui dari WP karena jabatannya, dan larangan ini berlaku pula bagi tenaga ahli seperti akuntan, pengacara, dan konsultan pajak yang membantu pelaksanaan UU perpajakan."},
+  {pasal:"Pasal 34A", q:"Pengecualian atas larangan kerahasiaan data Wajib Pajak dalam Pasal 34A hanya diperbolehkan untuk kepentingan apa, dan dengan izin siapa?", options:["Kepentingan pemasaran produk perbankan, tanpa izin", "Pemeriksaan di pengadilan pidana atau perdata, dengan izin tertulis Menteri Keuangan", "Permintaan wartawan, dengan izin DJP", "Kepentingan riset akademik, tanpa izin"], answer:1, explain:"Pengecualian larangan Pasal 34A hanya berlaku untuk kepentingan pemeriksaan di pengadilan pidana atau perdata, dan itu pun harus dengan izin tertulis dari Menteri Keuangan."},
+  {pasal:"Pasal 35", q:"Menurut Pasal 35 UU KUP, pihak ketiga yang wajib memberikan keterangan atau bukti tertulis kepada Dirjen Pajak antara lain?", options:["Bank, akuntan publik, notaris, dan konsultan pajak", "Hanya perusahaan asuransi", "Hanya perusahaan BUMN", "Hanya kantor imigrasi"], answer:0, explain:"Pasal 35 mewajibkan pihak ketiga seperti bank, akuntan publik, notaris, dan konsultan pajak untuk memberikan keterangan atau bukti tertulis yang diminta Dirjen Pajak terkait WP yang diperiksa/disidik."},
+  {pasal:"Pasal 35", q:"Untuk pihak bank, kewajiban memberikan keterangan menurut Pasal 35 baru berlaku jika ada?", options:["Persetujuan nasabah secara lisan", "Perintah tertulis dari Menteri Keuangan", "Surat kuasa dari OJK", "Putusan pengadilan yang berkekuatan hukum tetap"], answer:1, explain:"Berbeda dari pihak ketiga lain, kewajiban merahasiakan bagi bank baru ditiadakan untuk kepentingan perpajakan jika ada perintah tertulis dari Menteri Keuangan."},
+  {pasal:"Pasal 35A", q:"Pasal 35A UU KUP mewajibkan instansi pemerintah, lembaga, dan asosiasi untuk apa?", options:["Membayar pajak tambahan", "Memberikan data berkaitan dengan perpajakan kepada DJP guna pengawasan sistem self-assessment", "Menunjuk konsultan pajak resmi", "Mengaudit laporan keuangan DJP"], answer:1, explain:"Pasal 35A mewajibkan instansi pemerintah, lembaga, dan asosiasi memberikan data perpajakan kepada DJP untuk mengawasi kepatuhan sistem self-assessment; ketidakpatuhan dapat dikenai sanksi pidana kurungan atau denda."},
+  {pasal:"Pasal 16", q:"Kewenangan Dirjen Pajak menurut Pasal 16 UU KUP mencakup pembetulan atas hal-hal berikut, kecuali?", options:["Kesalahan tulis", "Kesalahan hitung", "Kekeliruan penerapan aturan dalam ketetapan pajak", "Perubahan tarif pajak oleh DPR"], answer:3, explain:"Pasal 16 memberi kewenangan bagi Dirjen Pajak untuk membetulkan kesalahan tulis, kesalahan hitung, atau kekeliruan penerapan aturan dalam ketetapan pajak — bukan mengubah tarif pajak yang merupakan ranah legislasi."},
+  {pasal:"Pasal 16", q:"Berapa jangka waktu maksimal penerbitan keputusan pembetulan menurut Pasal 16 sejak permohonan diterima lengkap?", options:["1 bulan", "3 bulan", "6 bulan", "12 bulan"], answer:2, explain:"Pasal 16 mengatur bahwa keputusan pembetulan harus diterbitkan paling lama 6 bulan sejak permohonan diterima secara lengkap."},
+  {pasal:"Pasal 36", q:"Menurut Pasal 36 UU KUP, DJP berwenang mengurangkan atau menghapuskan sanksi administrasi dalam kondisi apa?", options:["Karena kekhilafan Wajib Pajak atau bukan kesalahannya", "Setiap kali WP mengajukan keberatan", "Jika WP membayar di muka", "Jika DJP kekurangan pegawai pemeriksa"], answer:0, explain:"Pasal 36 memberi wewenang DJP mengurangkan/menghapuskan sanksi administrasi karena kekhilafan WP atau bukan kesalahannya, serta membatalkan ketetapan yang tidak benar atau hasil pemeriksaan tanpa prosedur semestinya."},
+  {pasal:"Pasal 36A", q:"Pegawai pajak yang menyalahgunakan wewenang sehingga merugikan negara, menurut Pasal 36A, dikenai sanksi berdasarkan apa?", options:["Hanya teguran internal DJP", "Peraturan perundang-undangan, termasuk ketentuan pidana dalam KUHP", "Pemotongan gaji sebesar 10%", "Tidak ada sanksi khusus"], answer:1, explain:"Pasal 36A menegaskan pegawai pajak yang menyalahgunakan wewenang sehingga merugikan negara dikenai sanksi sesuai peraturan perundang-undangan, termasuk ketentuan pidana dalam KUHP."},
+  {pasal:"Pasal 36B", q:"Pasal 36B UU KUP mewajibkan DJP untuk?", options:["Membangun dan mengembangkan sistem informasi berbasis teknologi guna mendukung pengawasan, pelayanan, dan pertukaran data perpajakan", "Membuka cabang di setiap kecamatan", "Menghapus seluruh data WP setelah 5 tahun", "Menyerahkan pengawasan pajak ke pihak swasta"], answer:0, explain:"Pasal 36B mewajibkan DJP membangun dan mengembangkan sistem informasi berbasis teknologi untuk mendukung pengawasan, pelayanan, dan pertukaran data perpajakan."},
+  {pasal:"Pasal 36C", q:"Pasal 36C UU KUP mengatur pembentukan lembaga pengawas independen bernama?", options:["Badan Pengawas Keuangan Negara", "Komite Pengawas Perpajakan", "Dewan Etik Perpajakan", "Otoritas Jasa Pajak"], answer:1, explain:"Pasal 36C mengatur pembentukan Komite Pengawas Perpajakan oleh Menteri Keuangan sebagai lembaga pengawas independen, yang tata kerjanya diatur melalui PMK."},
+  {pasal:"Pasal 36D", q:"Menurut Pasal 36D, insentif yang dapat diterima Direktorat Jenderal Pajak atas capaian kinerja tertentu dialokasikan melalui?", options:["Dana CSR perusahaan", "Anggaran Pendapatan dan Belanja Negara (APBN)", "Sumbangan Wajib Pajak", "Pinjaman luar negeri"], answer:1, explain:"Pasal 36D menyatakan DJP dapat menerima insentif berdasarkan pencapaian kinerja tertentu yang dialokasikan melalui APBN, dengan tata cara diatur melalui Peraturan Menteri Keuangan."},
+  {pasal:"Pasal 37A", q:"Pasal 37A ayat (1) tentang sunset policy memberikan pengampunan bunga keterlambatan kepada WP yang membetulkan SPT Tahunan PPh untuk masa sebelum tahun berapa?", options:["2005", "2007", "2010", "2015"], answer:1, explain:"Pasal 37A ayat (1) memberikan pengampunan bunga keterlambatan kepada WP yang secara sukarela membetulkan SPT Tahunan PPh masa sebelum 2007, meski mengakibatkan kurang bayar bertambah."},
+  {pasal:"Pasal 37A", q:"Pasal 37A ayat (2) memberikan pengampunan pajak lalu dan bebas pemeriksaan kepada siapa?", options:["Semua badan usaha tanpa syarat", "Orang Pribadi yang belum ber-NPWP dan mendaftarkan diri secara sukarela", "Wajib Pajak yang sedang disidik", "Pengusaha Kena Pajak yang terlambat lapor SPT Masa"], answer:1, explain:"Pasal 37A ayat (2) memberi pengampunan atas pajak yang belum/kurang dibayar dan bebas pemeriksaan kepada Orang Pribadi yang belum ber-NPWP dan mau mendaftarkan diri secara sukarela, selama SPT-nya benar dan tidak menyatakan lebih bayar."},
+  {pasal:"Pasal 38", q:"Perbuatan seperti apa yang dikategorikan sebagai 'kealpaan' menurut Pasal 38 UU KUP?", options:["Tidak sengaja, lalai, tidak hati-hati, atau kurang mengindahkan kewajiban", "Merencanakan penggelapan pajak secara sistematis", "Bekerja sama dengan pihak ketiga untuk memalsukan faktur", "Menyuap pejabat pajak"], answer:0, explain:"UU KUP mendefinisikan kealpaan sebagai perbuatan yang berarti tidak sengaja, lalai, tidak hati-hati, atau kurang mengindahkan kewajibannya — bukan perbuatan yang direncanakan secara sengaja."},
+  {pasal:"Pasal 38", q:"Bagi Wajib Pajak yang melanggar ketentuan Pasal 38 karena kealpaan untuk PERTAMA KALINYA, sanksi yang dikenakan adalah?", options:["Pidana penjara 6 bulan", "Sanksi administrasi berupa kenaikan 200% dari pajak kurang dibayar, bukan sanksi pidana", "Denda 4 kali pajak terutang", "Pencabutan NPWP secara permanen"], answer:1, explain:"Pelanggaran karena kealpaan yang pertama kali tidak dikenai sanksi pidana, melainkan sanksi administrasi berupa kenaikan sebesar 200% dari jumlah pajak kurang dibayar, yang ditetapkan melalui SKPKB."},
+  {pasal:"Pasal 39", q:"Sanksi pidana bagi perbuatan yang dilakukan dengan sengaja menurut Pasal 39 ayat (1) UU KUP adalah?", options:["Penjara 6 bulan–6 tahun dan denda 2–4 kali jumlah pajak terutang yang tidak/kurang dibayar", "Kurungan 3 bulan–1 tahun dan denda 1–2 kali pajak terutang", "Hanya sanksi administrasi tanpa pidana", "Penjara seumur hidup"], answer:0, explain:"Pasal 39 ayat (1) mengancam pidana penjara paling singkat 6 bulan dan paling lama 6 tahun, serta denda paling sedikit 2 kali dan paling banyak 4 kali jumlah pajak terutang yang tidak/kurang dibayar."},
+  {pasal:"Pasal 39A", q:"Penyalahgunaan faktur pajak menurut Pasal 39A UU KUP diancam dengan sanksi?", options:["Penjara 2–6 tahun dan denda 2–6 kali jumlah pajak dalam faktur pajak", "Kurungan 1 tahun dan denda 25 juta rupiah", "Penjara 6 bulan–2 tahun tanpa denda", "Hanya pencabutan status PKP"], answer:0, explain:"Pasal 39A mengancam penyalahgunaan faktur pajak dengan pidana penjara paling singkat 2 tahun dan paling lama 6 tahun, serta denda paling sedikit 2 kali dan paling banyak 6 kali jumlah pajak dalam faktur pajak."},
+  {pasal:"Pasal 41", q:"Pejabat yang KARENA KEALPAANNYA tidak memenuhi kewajiban merahasiakan data WP (Pasal 41 ayat 1) diancam pidana?", options:["Kurungan paling lama 1 tahun dan denda paling banyak Rp25.000.000", "Penjara paling lama 2 tahun dan denda paling banyak Rp50.000.000", "Denda tanpa kurungan sebesar Rp100.000.000", "Pemecatan tanpa proses hukum"], answer:0, explain:"Pasal 41 ayat (1) mengancam pejabat yang karena kealpaannya membocorkan kerahasiaan data WP dengan pidana kurungan paling lama 1 tahun dan denda paling banyak Rp25.000.000."},
+  {pasal:"Pasal 41", q:"Penuntutan tindak pidana pembocoran rahasia Wajib Pajak oleh pejabat (Pasal 41) hanya dilakukan atas dasar?", options:["Inisiatif kejaksaan tanpa laporan", "Pengaduan dari orang yang kerahasiaannya dilanggar", "Laporan media massa", "Permintaan DPR"], answer:1, explain:"Dijelaskan bahwa penuntutan tindak pidana dalam Pasal 41 hanya dilakukan atas dasar pengaduan dari orang yang kerahasiaannya dilanggar."},
+  {pasal:"Pasal 41A / 41B", q:"Setiap orang yang dengan sengaja menghalangi atau mempersulit penyidikan tindak pidana perpajakan (Pasal 41B) diancam pidana?", options:["Penjara paling lama 3 tahun dan denda paling banyak Rp75.000.000", "Kurungan paling lama 1 tahun dan denda paling banyak Rp25.000.000", "Penjara seumur hidup", "Hanya sanksi administrasi"], answer:0, explain:"Pasal 41B mengancam siapa saja yang dengan sengaja menghalangi atau mempersulit penyidikan tindak pidana perpajakan dengan pidana penjara paling lama 3 tahun dan denda paling banyak Rp75.000.000."},
+  {pasal:"Pasal 43", q:"Menurut Pasal 43 UU KUP, pihak yang dapat dipidana dalam tindak pidana perpajakan tidak terbatas pada Wajib Pajak saja, tetapi juga mencakup?", options:["Hanya pejabat DJP", "Wakil, kuasa, pegawai WP, akuntan publik, konsultan pajak, atau pihak lain yang menyuruh, turut serta, menganjurkan, atau membantu", "Hanya keluarga inti Wajib Pajak", "Hanya notaris yang membuat akta perusahaan"], answer:1, explain:"Pasal 43 memperluas pertanggungjawaban pidana kepada wakil, kuasa, pegawai WP, akuntan publik, konsultan pajak, atau pihak lain yang menyuruh melakukan, turut serta, menganjurkan, atau membantu tindak pidana perpajakan."},
+  {pasal:"Pasal 40", q:"Berapa lama daluwarsa penuntutan tindak pidana di bidang perpajakan menurut Pasal 40 UU KUP?", options:["5 tahun", "7 tahun", "10 tahun", "15 tahun"], answer:2, explain:"Pasal 40 mengatur daluwarsa penuntutan tindak pidana perpajakan selama 10 tahun sejak saat terutangnya pajak, berakhirnya masa pajak, bagian tahun pajak, atau tahun pajak yang bersangkutan, untuk memberi kepastian hukum."},
+  {pasal:"Asas Ultimum Remedium", q:"Yang dimaksud dengan asas 'ultimum remedium' dalam konteks penegakan hukum pidana perpajakan adalah?", options:["Pidana dijadikan upaya pertama sebelum langkah lain", "Hukum pidana dijadikan upaya terakhir, mengedepankan cara persuasif lebih dahulu", "Semua pelanggaran pajak wajib dipidana tanpa kecuali", "Pengampunan otomatis bagi semua Wajib Pajak"], answer:1, explain:"Ultimum remedium adalah asas hukum pidana yang menyatakan hukum (pidana) dijadikan upaya terakhir, sehingga penindakan atas pelanggaran mengedepankan cara persuasif dahulu, sejalan dengan tujuan utama DJP mengumpulkan penerimaan negara."},
+  {pasal:"Pasal 44B", q:"Menurut Pasal 44B ayat (1), atas permintaan siapa Jaksa Agung dapat menghentikan penyidikan tindak pidana perpajakan, dan untuk berapa lama?", options:["Permintaan DPR, paling lama 1 tahun", "Permintaan Menteri Keuangan, paling lama 6 bulan sejak surat permintaan", "Permintaan Presiden, tanpa batas waktu", "Permintaan Wajib Pajak langsung, paling lama 3 bulan"], answer:1, explain:"Pasal 44B ayat (1) menyatakan bahwa berdasarkan permintaan Menteri Keuangan, Jaksa Agung dapat menghentikan penyidikan tindak pidana perpajakan paling lama 6 bulan sejak tanggal surat permintaan, sepanjang perkara belum dilimpahkan ke pengadilan."},
+  {pasal:"Pasal 44B", q:"Syarat utama bagi WP atau terdakwa untuk mengajukan permohonan penghentian penyidikan menurut Pasal 44B ayat (2) adalah?", options:["Mengajukan banding ke Mahkamah Agung", "Melunasi jumlah kerugian pendapatan negara/pajak terutang beserta sanksi administratif berupa denda", "Mengganti seluruh pengurus perusahaan", "Menyerahkan aset perusahaan kepada negara"], answer:1, explain:"Pasal 44B ayat (2) mensyaratkan WP atau terdakwa melunasi jumlah kerugian pada pendapatan negara, pajak terutang, atau jumlah pajak dalam faktur pajak sesuai proporsinya, ditambah sanksi administratif berupa denda, sebagai syarat pengajuan penghentian penyidikan."}
+];
+
+let current = 0;
+let selected = null;
+let locked = false;
+let score = 0;
+const userAnswers = [];
+
+const els = {
+  qIndex: document.getElementById('qIndex'),
+  qScoreLive: document.getElementById('qScoreLive'),
+  progressFill: document.getElementById('progressFill'),
+  pasalTag: document.getElementById('pasalTag'),
+  questionText: document.getElementById('questionText'),
+  optionsWrap: document.getElementById('optionsWrap'),
+  explainWrap: document.getElementById('explainWrap'),
+  explainText: document.getElementById('explainText'),
+  actionBtn: document.getElementById('actionBtn'),
+  stamp: document.getElementById('stamp'),
+  quizView: document.getElementById('quizView'),
+  resultView: document.getElementById('resultView'),
+  finalScore: document.getElementById('finalScore'),
+  finalVerdict: document.getElementById('finalVerdict'),
+  reviewList: document.getElementById('reviewList'),
+  restartBtn: document.getElementById('restartBtn')
+};
+
+function renderQuestion(){
+  const item = questions[current];
+  selected = null;
+  locked = false;
+
+  els.qIndex.textContent = String(current+1).padStart(2,'0');
+  els.qScoreLive.textContent = `Skor sementara: ${score}`;
+  els.progressFill.style.width = `${(current/questions.length)*100}%`;
+  els.pasalTag.textContent = item.pasal;
+  els.questionText.textContent = item.q;
+
+  els.optionsWrap.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  item.options.forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}.</span><span>${opt}</span>`;
+    btn.addEventListener('click', ()=> selectOption(i, btn));
+    els.optionsWrap.appendChild(btn);
+  });
+
+  els.explainWrap.classList.remove('open');
+  els.explainText.textContent = item.explain;
+  els.stamp.classList.remove('show','benar','salah');
+  els.actionBtn.textContent = 'Periksa Jawaban';
+  els.actionBtn.disabled = true;
+}
+
+function selectOption(i, btn){
+  if(locked) return;
+  selected = i;
+  [...els.optionsWrap.children].forEach(c=>c.classList.remove('selected'));
+  btn.classList.add('selected');
+  els.actionBtn.disabled = false;
+}
+
+function checkAnswer(){
+  const item = questions[current];
+  locked = true;
+  const isCorrect = selected === item.answer;
+  if(isCorrect) score++;
+
+  userAnswers.push({q: item.q, correct: isCorrect});
+
+  [...els.optionsWrap.children].forEach((c, i)=>{
+    c.classList.add('locked');
+    if(i === item.answer) c.classList.add('correct');
+    else if(i === selected) c.classList.add('incorrect');
+  });
+
+  els.stamp.textContent = isCorrect ? 'BENAR' : 'SALAH';
+  els.stamp.classList.add('show', isCorrect ? 'benar' : 'salah');
+  els.explainWrap.classList.add('open');
+  els.qScoreLive.textContent = `Skor sementara: ${score}`;
+
+  els.actionBtn.textContent = current === questions.length-1 ? 'Lihat Hasil' : 'Soal Berikutnya';
+  els.actionBtn.disabled = false;
+}
+
+function nextStep(){
+  if(!locked){
+    checkAnswer();
+    return;
+  }
+  if(current === questions.length-1){
+    showResults();
+  } else {
+    current++;
+    renderQuestion();
+  }
+}
+
+function showResults(){
+  els.progressFill.style.width = '100%';
+  els.quizView.style.display = 'none';
+  els.resultView.style.display = 'block';
+  els.finalScore.textContent = `${score}/${questions.length}`;
+
+  let verdict;
+  const pct = score/questions.length;
+  if(pct === 1) verdict = 'Sempurna — pemahaman Anda atas Bab 12 sangat lengkap.';
+  else if(pct >= 0.8) verdict = 'Sangat baik — sebagian besar ketentuan sudah dikuasai.';
+  else if(pct >= 0.6) verdict = 'Cukup baik — masih ada beberapa pasal yang perlu diulas ulang.';
+  else verdict = 'Perlu belajar lebih lanjut — coba baca ulang materi Bab 12.';
+  els.finalVerdict.textContent = verdict;
+
+  els.reviewList.innerHTML = '';
+  userAnswers.forEach((a, i)=>{
+    const row = document.createElement('div');
+    row.className = `review-item ${a.correct ? 'ok' : 'bad'}`;
+    row.innerHTML = `<span class="mark">${a.correct ? '✓' : '✕'}</span><span class="qtext">${i+1}. ${a.q}</span>`;
+    els.reviewList.appendChild(row);
+  });
+}
+
+els.actionBtn.addEventListener('click', nextStep);
+
+els.restartBtn.addEventListener('click', ()=>{
+  current = 0; score = 0; userAnswers.length = 0;
+  els.resultView.style.display = 'none';
+  els.quizView.style.display = 'block';
+  renderQuestion();
+});
+
+// theme toggle
+const themeToggle = document.getElementById('themeToggle');
+const switchLabel = document.getElementById('switchLabel');
+function setTheme(dark){
+  document.documentElement.classList.toggle('dark', dark);
+  switchLabel.textContent = dark ? 'Gelap' : 'Terang';
+}
+themeToggle.addEventListener('click', ()=>{
+  setTheme(!document.documentElement.classList.contains('dark'));
+});
+setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+renderQuestion();
+</script>
+</body>
+</html>
